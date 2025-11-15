@@ -1,58 +1,20 @@
-[gd_scene load_steps=8 format=3 uid="uid://test_gun_scene"]
+[gd_scene load_steps=6 format=3 uid="uid://gn2h5hx6te08"]
 
-[ext_resource type="Script" path="res://player/player.gd" id="1_player"]
-[ext_resource type="Script" path="res://enemies/enemy.gd" id="2_enemy"]
-[ext_resource type="PackedScene" uid="uid://ammo_display_ui" path="res://ui/ammo_display.tscn" id="3_ammo"]
-[ext_resource type="PackedScene" uid="uid://c8vx3j5k9m2n1" path="res://ui/health_bar.tscn" id="4_health"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(40, 40)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_player"]
-animations = [{
-"frames": [],
-"loop": true,
-"name": &"up",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": true,
-"name": &"walk",
-"speed": 5.0
-}]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_visual"]
-size = Vector2(30, 50)
+[ext_resource type="PackedScene" uid="uid://brop5juemvf1j" path="res://player/player.tscn" id="1_ehqj0"]
+[ext_resource type="Script" uid="uid://cood84pqr2hfj" path="res://enemies/enemy.gd" id="2_enemy"]
+[ext_resource type="PackedScene" uid="uid://bhf7afhuksbra" path="res://ui/ammo_display.tscn" id="3_ammo"]
+[ext_resource type="PackedScene" uid="uid://c8vx3j5lam2n1" path="res://ui/health_bar.tscn" id="4_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
 size = Vector2(40, 40)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy_visual"]
-size = Vector2(40, 40)
-
 [node name="GunTest" type="Node2D"]
 
-[node name="Player" type="CharacterBody2D" parent="."]
-position = Vector2(576, 324)
-script = ExtResource("1_player")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player"]
-sprite_frames = SubResource("SpriteFrames_player")
-animation = &"up"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-shape = SubResource("RectangleShape2D_player")
-
-[node name="VisualRect" type="ColorRect" parent="Player"]
-offset_left = -15.0
-offset_top = -25.0
-offset_right = 15.0
-offset_bottom = 25.0
-color = Color(0.2, 0.5, 1, 1)
+[node name="Player2" parent="." instance=ExtResource("1_ehqj0")]
+position = Vector2(1152, 648)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(576, 324)
-enabled = true
 
 [node name="Enemy" type="RigidBody2D" parent="."]
 position = Vector2(800, 324)
@@ -61,8 +23,8 @@ gravity_scale = 0.0
 lock_rotation = true
 freeze_mode = 1
 script = ExtResource("2_enemy")
-max_health = 100
 speed = 0.0
+max_health = 100
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy"]
 shape = SubResource("RectangleShape2D_enemy")
@@ -73,7 +35,6 @@ offset_top = -20.0
 offset_right = 20.0
 offset_bottom = 20.0
 color = Color(1, 0.2, 0.2, 1)
-
 
 [node name="AmmoDisplay" parent="." instance=ExtResource("3_ammo")]
 

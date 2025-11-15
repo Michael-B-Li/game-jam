@@ -1,4 +1,3 @@
-
 [gd_scene load_steps=3 format=3 uid="uid://g1lj5mar4jm0"]
 
 [ext_resource type="Script" path="res://enemies/pathfinding_enemy.gd" id="1_pathfinding"]

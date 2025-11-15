@@ -5,7 +5,7 @@ signal play_pressed
 signal settings_pressed
 
 # Reference to the game scene to load
-@export var game_scene_path: String = "res://player/gun_test.tscn"
+@export var game_scene_path: String = "res://Dungeon/dungeonRoom.tscn"
 @export var settings_scene_path: String = "res://ui/settings_menu.tscn"
 
 func _ready():

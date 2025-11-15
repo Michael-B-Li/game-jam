@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://c7d8e9f0g1h2i"]
+[gd_scene load_steps=3 format=3 uid="uid://c7d8faf0g1h2i"]
 
 [ext_resource type="Script" path="res://ui/settings_menu.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://c3w61p24ge26h" path="res://snowbell-font/Snowbell-Wp4g9.ttf" id="2_font"]
