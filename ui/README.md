@@ -66,9 +66,9 @@ If you want a custom bullet sprite:
 ```gdscript
 # In ammo_display.gd, replace create_bullet_icon() with:
 func create_bullet_icon() -> void:
-    if bullet_icon is TextureRect:
-        # Use a built-in Godot icon
-        bullet_icon.texture = get_theme_icon("FixedMaterial", "EditorIcons")
+	if bullet_icon is TextureRect:
+		# Use a built-in Godot icon
+		bullet_icon.texture = get_theme_icon("FixedMaterial", "EditorIcons")
 ```
 
 ## 🎯 Using the Ammo Display
@@ -110,7 +110,7 @@ In `ammo_display.gd`, modify `update_ammo_display()`:
 
 # Change to your preference:
 if current == 0:
-    ammo_label.modulate = Color.ORANGE_RED  # Custom color
+	ammo_label.modulate = Color.ORANGE_RED  # Custom color
 ```
 
 ### Change Font Size

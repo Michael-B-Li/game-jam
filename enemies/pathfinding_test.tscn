@@ -1,0 +1,82 @@
+
+[gd_scene load_steps=10 format=3 uid="uid://cjml8l0ju7bhl"]
+
+[ext_resource type="Script" uid="uid://dquv612we276c" path="res://player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://enemies/pathfinding_test_setup.gd" id="1_setup"]
+[ext_resource type="PackedScene" uid="uid://g1lj5mar4jm0" path="res://enemies/pathfinding_enemy.tscn" id="2_pathfinding"]
+[ext_resource type="PackedScene" uid="uid://bhf7afhuksbra" path="res://ui/ammo_display.tscn" id="3_ammo"]
+[ext_resource type="PackedScene" path="res://ui/health_bar.tscn" id="4_health"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1"]
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+1:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_1"]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_1")
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_player"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(40, 40)
+
+[node name="PathfindingTest" type="Node2D"]
+script = ExtResource("1_setup")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_1")
+format = 2
+
+[node name="Wall" type="TileMapLayer" parent="TileMap"]
+tile_set = SubResource("TileSet_1")
+
+[node name="Ground" type="TileMapLayer" parent="TileMap"]
+tile_set = SubResource("TileSet_1")
+
+[node name="Player" type="Area2D" parent="."]
+position = Vector2(200, 300)
+script = ExtResource("1_player")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player"]
+sprite_frames = SubResource("SpriteFrames_player")
+animation = &"up"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="VisualRect" type="ColorRect" parent="Player"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(0.2, 0.6, 1, 1)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+
+[node name="PathfindingEnemy" parent="." instance=ExtResource("2_pathfinding")]
+position = Vector2(900, 300)
+
+[node name="PathfindingEnemy2" parent="." instance=ExtResource("2_pathfinding")]
+position = Vector2(900, 150)
+
+[node name="PathfindingEnemy3" parent="." instance=ExtResource("2_pathfinding")]
+position = Vector2(900, 450)
+
+[node name="AmmoDisplay" parent="." instance=ExtResource("3_ammo")]
+
+[node name="HealthBar" parent="." instance=ExtResource("4_health")]
+
+[connection signal="body_entered" from="Player" to="Player" method="_on_player_body_entered"]
