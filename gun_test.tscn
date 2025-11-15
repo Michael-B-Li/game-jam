@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3 uid="uid://test_gun_scene"]
+
+[ext_resource type="Script" path="res://player.gd" id="1_player"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(40, 40)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_player"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_visual"]
+size = Vector2(30, 50)
+
+[node name="GunTest" type="Node2D"]
+
+[node name="Player" type="Area2D" parent="."]
+position = Vector2(576, 324)
+script = ExtResource("1_player")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player"]
+sprite_frames = SubResource("SpriteFrames_player")
+animation = &"up"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="VisualRect" type="ColorRect" parent="Player"]
+offset_left = -15.0
+offset_top = -25.0
+offset_right = 15.0
+offset_bottom = 25.0
+color = Color(0.2, 0.5, 1, 1)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(576, 324)
+enabled = true
+
+[connection signal="body_entered" from="Player" to="Player" method="_on_player_body_entered"]
