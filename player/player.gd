@@ -7,7 +7,10 @@ const GlitchController = preload("res://glitches/glitch_controller.gd")
 const GlitchTypes = preload("res://glitches/glitch_types.gd")
 
 signal hit
+signal health_changed(new_health: float)
 @export var speed = 400
+@export var max_health: float = 100.0
+var health: float = 100.0
 var screen_size
 var gun_controller: GunController
 var glitch_controller: GlitchController
@@ -41,10 +44,10 @@ func _ready() -> void:
 	gun_controller.available_guns = GunPresets.get_all_guns()
 	if gun_controller.available_guns.size() > 0:
 		gun_controller.current_gun = gun_controller.available_guns[0]
-		
+
 		# Initialize ammo after guns are set (in case _ready() already ran)
 		gun_controller.initialize_ammo()
-		
+
 		print("Gun controller setup complete. Current gun: ", gun_controller.current_gun.gun_name)
 	else:
 		push_error("No guns available! GunPresets.get_all_guns() returned empty array.")
@@ -64,6 +67,10 @@ func _ready() -> void:
 	glitch_controller.glitch_activated.connect(_on_glitch_activated)
 	glitch_controller.glitch_deactivated.connect(_on_glitch_deactivated)
 	glitch_controller.energy_changed.connect(_on_energy_changed)
+
+	# Initialize health
+	health = max_health
+	health_changed.emit(health)
 
 
 # We use _physics_process for physics-based movement
@@ -103,16 +110,14 @@ func _physics_process(delta):
 			$AnimatedSprite2D.animation = "up"
 			$AnimatedSprite2D.flip_v = velocity.y > 0
 
-#
-# This function was the problem! It was part of Area2D and was
-# being triggered by the walls, causing the player to hide.
-# A CharacterBody2D doesn't use this. If you want to detect
-# enemies, you'll add a *separate* Area2D as a child.
-#
-# func _on_player_body_entered(_body: Node2D):
-# 	hide()
-# 	hit.emit()
-# 	$CollisionShape2D.set_deferred("disabled", true)
+	# Test key for taking damage
+	if Input.is_action_just_pressed("ui_page_down"):
+		take_damage(10)
+
+func _on_player_body_entered(_body: Node2D):
+	hide()
+	hit.emit()
+	$CollisionShape2D.set_deferred("disabled", true)
 
 func start(pos):
 	position = pos
@@ -135,3 +140,23 @@ func _on_glitch_deactivated(glitch: Glitch) -> void:
 
 func _on_energy_changed(current: int, max_energy: int) -> void:
 	print("Energy: ", current, "/", max_energy)
+
+func take_damage(damage: float) -> void:
+	health = max(0, health - damage)
+	health_changed.emit(health)
+	print("Player took damage! Health: ", health, "/", max_health)
+
+	if health <= 0:
+		die()
+
+func heal(amount: float) -> void:
+	health = min(max_health, health + amount)
+	health_changed.emit(health)
+	print("Player healed! Health: ", health, "/", max_health)
+
+func die() -> void:
+	print("Player died!")
+	hide()
+	hit.emit()
+	if has_node("CollisionShape2D"):
+		$CollisionShape2D.set_deferred("disabled", true)

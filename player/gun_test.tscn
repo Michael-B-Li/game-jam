@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://enemies/enemy.gd" id="2_enemy"]
 [ext_resource type="PackedScene" uid="uid://ammo_display_ui" path="res://ui/ammo_display.tscn" id="3_ammo"]
+[ext_resource type="PackedScene" uid="uid://c8vx3j5k9m2n1" path="res://ui/health_bar.tscn" id="4_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(40, 40)
@@ -76,3 +77,5 @@ color = Color(1, 0.2, 0.2, 1)
 [connection signal="body_entered" from="Player" to="Player" method="_on_player_body_entered"]
 
 [node name="AmmoDisplay" parent="." instance=ExtResource("3_ammo")]
+
+[node name="HealthBar" parent="." instance=ExtResource("4_health")]

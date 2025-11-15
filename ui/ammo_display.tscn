@@ -21,8 +21,9 @@ grow_vertical = 0
 alignment = 2
 
 [node name="BulletIcon" type="TextureRect" parent="AmmoContainer"]
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(200, 200)
 layout_mode = 2
+size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
 
