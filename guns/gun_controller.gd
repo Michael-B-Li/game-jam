@@ -18,18 +18,24 @@ var shoot_timer: float = 0.0
 
 func _ready() -> void:
 	# Initialize ammo for all guns
+	initialize_ammo()
+
+func initialize_ammo() -> void:
+	# Initialize ammo for all guns
 	for gun in available_guns:
-		if gun.ammo_capacity > 0:
-			gun_ammo[gun] = gun.ammo_capacity
-		else:
-			gun_ammo[gun] = -1
+		if not gun_ammo.has(gun):
+			if gun.ammo_capacity > 0:
+				gun_ammo[gun] = gun.ammo_capacity
+			else:
+				gun_ammo[gun] = -1
 
 	# Set current gun ammo
 	if current_gun:
-		if current_gun.ammo_capacity > 0:
-			gun_ammo[current_gun] = current_gun.ammo_capacity
-		else:
-			gun_ammo[current_gun] = -1
+		if not gun_ammo.has(current_gun):
+			if current_gun.ammo_capacity > 0:
+				gun_ammo[current_gun] = current_gun.ammo_capacity
+			else:
+				gun_ammo[current_gun] = -1
 
 func _process(delta: float) -> void:
 	if not current_gun:
@@ -65,6 +71,7 @@ func _process(delta: float) -> void:
 func shoot() -> void:
 	if not bullet_scene:
 		push_warning("No bullet scene assigned to GunController")
+		print("ERROR: No bullet scene!")
 		return
 
 	# Check ammo
@@ -72,6 +79,7 @@ func shoot() -> void:
 		var current_ammo = gun_ammo.get(current_gun, 0)
 		if current_ammo <= 0:
 			# Out of ammo - can't shoot
+			print("Out of ammo! Current ammo: ", current_ammo)
 			return
 		gun_ammo[current_gun] = current_ammo - 1
 		ammo_changed.emit(gun_ammo[current_gun], current_gun.ammo_capacity)
@@ -84,12 +92,15 @@ func shoot() -> void:
 	# Get shooting direction (towards mouse)
 	var mouse_pos: Vector2 = get_global_mouse_position()
 	var shoot_direction: Vector2 = (mouse_pos - global_position).normalized()
+	
+	print("Shooting! Mouse: ", mouse_pos, " Player: ", global_position, " Direction: ", shoot_direction)
 
 	# Spawn bullets based on bullet_count
 	for i in range(current_gun.bullet_count):
 		var bullet: Bullet = bullet_scene.instantiate()
 		get_tree().root.add_child(bullet)
 		bullet.global_position = global_position
+		print("Spawned bullet at: ", bullet.global_position)
 
 		# Calculate spread
 		var angle_offset: float = 0.0

@@ -26,15 +26,22 @@ func _ready() -> void:
 	gun_controller = GunController.new()
 	add_child(gun_controller)
 
-	# Add all available guns
-	gun_controller.available_guns = GunPresets.get_all_guns()
-	gun_controller.current_gun = gun_controller.available_guns[0]
-
 	# Load bullet scene - create bullet.tscn in Godot editor if not exists
 	if ResourceLoader.exists("res://guns/bullet.tscn"):
 		gun_controller.bullet_scene = load("res://guns/bullet.tscn")
+		print("Bullet scene loaded successfully")
 	else:
 		push_warning("bullet.tscn not found. Create it in Godot editor or shooting won't work.")
+		print("ERROR: bullet.tscn not found!")
+
+	# Add all available guns
+	gun_controller.available_guns = GunPresets.get_all_guns()
+	gun_controller.current_gun = gun_controller.available_guns[0]
+	
+	# Initialize ammo after guns are set (in case _ready() already ran)
+	gun_controller.initialize_ammo()
+	
+	print("Gun controller setup complete. Current gun: ", gun_controller.current_gun.gun_name)
 
 	# Connect gun signals for UI updates (optional)
 	gun_controller.gun_switched.connect(_on_gun_switched)

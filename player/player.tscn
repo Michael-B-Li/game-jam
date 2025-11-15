@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://brop5juemvf1j"]
 
-[ext_resource type="Script" uid="uid://dquv612we276c" path="res://player.gd" id="1_4flbx"]
+[ext_resource type="Script" uid="uid://dquv612we276c" path="res://player/player.gd" id="1_4flbx"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_onrkg"]
 animations = [{
