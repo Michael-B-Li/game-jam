@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8vx3j5k9m2n1"]
+
+[ext_resource type="Script" uid="uid://d4k2m5n6o7p8q" path="res://ui/health_bar.gd" id="1_health"]
+[ext_resource type="FontFile" uid="uid://c3w61p24ge26h" path="res://snowbell-font/Snowbell-Wp4g9.ttf" id="2_font"]
+
+[node name="HealthBar" type="CanvasLayer"]
+script = ExtResource("1_health")
+
+[node name="HealthContainer" type="VBoxContainer" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -100.0
+offset_right = 220.0
+offset_bottom = -20.0
+grow_vertical = 0
+
+[node name="HealthLabel" type="Label" parent="HealthContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "Health"
+
+[node name="ProgressBar" type="ProgressBar" parent="HealthContainer"]
+custom_minimum_size = Vector2(200, 30)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="ProgressBar" type="ColorRect" parent="HealthContainer/ProgressBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Fill" type="ColorRect" parent="HealthContainer/ProgressBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.8, 0.1, 0.1, 1)
