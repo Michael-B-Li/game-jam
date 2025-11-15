@@ -12,6 +12,7 @@ signal health_changed(new_health: float)
 @export var max_health: float = 100.0
 var health: float = 100.0
 var screen_size
+var last_dir = Vector2.DOWN
 var gun_controller: GunController
 var glitch_controller: GlitchController
 
@@ -86,29 +87,66 @@ func _physics_process(delta):
 	if Input.is_action_pressed("move_up"):
 		input_vector.y -= 1
 
-	# Set the final velocity
-	if input_vector.length() > 0:
-		velocity = input_vector.normalized() * speed
-		if has_node("AnimatedSprite2D"):
-			$AnimatedSprite2D.play()
+	var dir = input_vector.normalized()
+	
+	# Determine current movement characteristics
+	var is_moving = dir.length_squared() > 0
+	
+	# Only flip the sprite when moving
+
+	if is_moving:
+		# --- MOVEMENT LOGIC ---
+		last_dir = dir # Store the non-zero direction
+		velocity = dir * speed
+		
+		$AnimatedSprite2D.play()
+		
+		$AnimatedSprite2D.flip_h = dir.x < 0
+		
+		# Determine animation based on direction
+		if dir.y < 0:
+			# Moving Up/Backward
+			if dir.x != 0:
+				$AnimatedSprite2D.animation = "w_bd"
+			else:
+				$AnimatedSprite2D.animation = "w_b"
+		elif dir.y > 0:
+			# Moving Down/Forward
+			if dir.x != 0:
+				$AnimatedSprite2D.animation = "w_fd"
+			else:
+				$AnimatedSprite2D.animation = "w_f"
+		else:
+			# Pure Sideways Movement (dir.y == 0)
+			$AnimatedSprite2D.animation = "w_fd"
 	else:
-		velocity = Vector2.ZERO # Stop moving
-		if has_node("AnimatedSprite2D"):
-			$AnimatedSprite2D.stop()
+		# --- IDLE LOGIC ---
+		$AnimatedSprite2D.play()
+		# Set flip based on the last horizontal movement
+		$AnimatedSprite2D.flip_h = last_dir.x < 0
+		velocity = Vector2.ZERO
+		
+		# Idle animation selection based on last_dir
+		if last_dir.y < 0:
+			# Last movement was Up/Backward
+			if last_dir.x != 0:
+				# Stopped from diagonal up
+				$AnimatedSprite2D.animation = "i_bd"
+			else:
+				# Stopped from moving purely up
+				$AnimatedSprite2D.animation = "i_b"
+		else:
+			# Last movement was Down/Forward or Pure Sideways (y >= 0)
+			if last_dir.x != 0:
+				# Stopped from diagonal down or pure side
+				$AnimatedSprite2D.animation = "i_fd"
+			else:
+				# Stopped from moving purely down/forward
+				$AnimatedSprite2D.animation = "i_f"
 
-	# THIS IS THE FIX:
-	# move_and_slide() handles all movement and collision.
-	move_and_slide()
+	position += velocity * delta
+	position = position.clamp(Vector2.ZERO, screen_size)
 
-	# Handle animations AFTER moving
-	if has_node("AnimatedSprite2D"):
-		if velocity.x != 0:
-			$AnimatedSprite2D.animation = "walk"
-			$AnimatedSprite2D.flip_v = false
-			$AnimatedSprite2D.flip_h = velocity.x < 0
-		elif velocity.y != 0:
-			$AnimatedSprite2D.animation = "up"
-			$AnimatedSprite2D.flip_v = velocity.y > 0
 
 	# Test key for taking damage
 	if Input.is_action_just_pressed("ui_page_down"):
