@@ -1,4 +1,5 @@
-extends Area2D
+# We now extend CharacterBody2D for physics and collision
+extends CharacterBody2D
 
 # Preload glitch system
 const Glitch = preload("res://glitches/glitch.gd")
@@ -14,10 +15,9 @@ var glitch_controller: GlitchController
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 
-	# Show player for testing (comment out if using start() function)
-	show()
+	# We let the 'start()' function handle this
 	if has_node("CollisionShape2D"):
-		$CollisionShape2D.disabled = false
+		$CollisionShape2D.disabled = true
 
 	# Set up gun controller
 	gun_controller = GunController.new()
@@ -57,29 +57,33 @@ func _ready() -> void:
 	glitch_controller.energy_changed.connect(_on_energy_changed)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	var velocity = Vector2.ZERO
+# We use _physics_process for physics-based movement
+func _physics_process(delta):
+	# Get input vector
+	var input_vector = Vector2.ZERO
 	if Input.is_action_pressed("move_right"):
-		print('Player moving right')
-		velocity.x += 1
+		input_vector.x += 1
 	if Input.is_action_pressed("move_left"):
-		print('Player moving left')
-		velocity.x -= 1
+		input_vector.x -= 1
 	if Input.is_action_pressed("move_down"):
-		print('Player moving down')
-		velocity.y += 1
+		input_vector.y += 1
 	if Input.is_action_pressed("move_up"):
-		print('Player moving up')
-		velocity.y -= 1
+		input_vector.y -= 1
 
-	if velocity.length() > 0:
-		velocity = velocity.normalized() * speed
+	# Set velocity
+	if input_vector.length() > 0:
+		velocity = input_vector.normalized() * speed
 		$AnimatedSprite2D.play()
 	else:
+		velocity = Vector2.ZERO # Stop moving
 		$AnimatedSprite2D.stop()
-	position += velocity * delta
-	position = position.clamp(Vector2.ZERO, screen_size)
+	
+	# This function moves the player and handles collisions automatically
+	move_and_slide()
+	
+	# We remove the position.clamp() line so you can move around the map
+	
+	# Animation logic
 	if velocity.x != 0:
 		$AnimatedSprite2D.animation = "walk"
 		$AnimatedSprite2D.flip_v = false
@@ -88,15 +92,23 @@ func _process(delta):
 		$AnimatedSprite2D.animation = "up"
 		$AnimatedSprite2D.flip_v = velocity.y > 0
 
-func _on_player_body_entered(_body: Node2D):
-	hide()
-	hit.emit()
-	$CollisionShape2D.set_deferred("disabled", true)
+#
+# This function was the problem! It was part of Area2D and was
+# being triggered by the walls, causing the player to hide.
+# A CharacterBody2D doesn't use this. If you want to detect
+# enemies, you'll add a *separate* Area2D as a child.
+#
+# func _on_player_body_entered(_body: Node2D):
+# 	hide()
+# 	hit.emit()
+# 	$CollisionShape2D.set_deferred("disabled", true)
 
 func start(pos):
 	position = pos
 	show()
 	$CollisionShape2D.disabled = false
+
+# --- These signal functions are all fine ---
 
 func _on_gun_switched(gun: Gun) -> void:
 	print("Switched to: ", gun.gun_name)

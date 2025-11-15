@@ -7,7 +7,7 @@ extends Node2D
 
 # --- Node References ---
 @onready var ground_layer: TileMapLayer = $TileMap/Ground
-@onready var walls_layer: TileMapLayer = $TileMap/Walls
+@onready var walls_layer: TileMapLayer = $TileMap/Wall
 @onready var player: CharacterBody2D = $Player # Make sure this matches your player type
 
 # --- Tile Atlas Coordinates ---
