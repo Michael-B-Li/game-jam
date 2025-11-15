@@ -1,8 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://pt4fhipd38xj"]
+[gd_scene load_steps=3 format=3 uid="uid://pt4fhipd38xj"]
 
 [ext_resource type="Script" uid="uid://btswsfmkatcs5" path="res://enemies/baddie1.gd" id="1_6vorl"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c6u6e"]
+
 [node name="Baddie" type="RigidBody2D"]
+position = Vector2(39, 21)
 collision_mask = 0
 gravity_scale = 0.0
 script = ExtResource("1_6vorl")
@@ -11,5 +14,13 @@ metadata/_edit_group_ = true
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_c6u6e")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+color = Color(0.71250284, 0.4901722, 0.28937796, 1)

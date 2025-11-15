@@ -19,7 +19,8 @@ func _desired_velocity(delta: float) -> Vector2:
 	if _time_until_flip <= 0.0 or _direction == Vector2.ZERO:
 		_direction = _pick_direction()
 		_time_until_flip = max(direction_change_interval, 0.1)
-	return _direction * speed
+	#return _direction * speed
+	return Vector2(0,0)
 
 func _pick_direction() -> Vector2:
 	var dir := Vector2(_rng.randf_range(-1.0, 1.0), _rng.randf_range(-1.0, 1.0))

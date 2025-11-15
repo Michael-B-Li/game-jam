@@ -1,9 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://by0y4tk3eu8ax"]
+[gd_scene load_steps=11 format=3 uid="uid://by0y4tk3eu8ax"]
 
 [ext_resource type="Script" uid="uid://my0wow3x32jb" path="res://Dungeon/dungeon_room.gd" id="1_wux5i"]
 [ext_resource type="Texture2D" uid="uid://bk5acrkreywyk" path="res://Assets/Rudimentary_tileset.png" id="2_pw6kb"]
+[ext_resource type="PackedScene" uid="uid://pt4fhipd38xj" path="res://enemies/baddie.tscn" id="2_qb6wj"]
 [ext_resource type="PackedScene" uid="uid://brop5juemvf1j" path="res://player/player.tscn" id="3_pw6kb"]
 [ext_resource type="Texture2D" uid="uid://c3swm7cjq21od" path="res://Assets/green-door.png" id="3_y0ckw"]
+[ext_resource type="Script" uid="uid://cw4ibri5x2idx" path="res://Dungeon/RoomLabel.gd" id="5_1ijg7"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_t60vt"]
 texture = ExtResource("2_pw6kb")
@@ -24,18 +26,22 @@ sources/0 = SubResource("TileSetAtlasSource_1ijg7")
 
 [node name="Dungeon" type="Node2D"]
 script = ExtResource("1_wux5i")
+baddie_scene = ExtResource("2_qb6wj")
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_jai0l")
 format = 2
 
 [node name="Wall" type="TileMapLayer" parent="TileMap"]
+z_index = 1
 tile_set = SubResource("TileSet_jai0l")
 
 [node name="Ground" type="TileMapLayer" parent="TileMap"]
+z_index = -10
 tile_set = SubResource("TileSet_jai0l")
 
 [node name="Door" type="TileMapLayer" parent="TileMap"]
+z_index = 5
 tile_set = SubResource("TileSet_qb6wj")
 
 [node name="Player" parent="." instance=ExtResource("3_pw6kb")]
@@ -52,3 +58,13 @@ offset_bottom = 1560.0
 color = Color(0, 0, 0, 1)
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="RoomLabel" type="Label" parent="UI"]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Room: 1"
+script = ExtResource("5_1ijg7")
+
+[node name="EnemyContainer" type="Node2D" parent="."]
