@@ -1,6 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://test_gun_scene"]
+[gd_scene load_steps=8 format=3 uid="uid://test_gun_scene"]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://enemies/enemy.gd" id="2_enemy"]
+[ext_resource type="PackedScene" uid="uid://ammo_display_ui" path="res://ui/ammo_display.tscn" id="3_ammo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(40, 40)
@@ -20,6 +22,12 @@ animations = [{
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_visual"]
 size = Vector2(30, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
+size = Vector2(40, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy_visual"]
+size = Vector2(40, 40)
 
 [node name="GunTest" type="Node2D"]
 
@@ -45,4 +53,26 @@ color = Color(0.2, 0.5, 1, 1)
 position = Vector2(576, 324)
 enabled = true
 
+[node name="Enemy" type="RigidBody2D" parent="."]
+position = Vector2(800, 324)
+collision_layer = 4
+gravity_scale = 0.0
+lock_rotation = true
+freeze_mode = 1
+script = ExtResource("2_enemy")
+max_health = 100
+speed = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy"]
+shape = SubResource("RectangleShape2D_enemy")
+
+[node name="VisualRect" type="ColorRect" parent="Enemy"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(1, 0.2, 0.2, 1)
+
 [connection signal="body_entered" from="Player" to="Player" method="_on_player_body_entered"]
+
+[node name="AmmoDisplay" parent="." instance=ExtResource("3_ammo")]

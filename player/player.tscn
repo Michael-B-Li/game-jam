@@ -21,6 +21,8 @@ size = Vector2(5, 5)
 [node name="Player" type="CharacterBody2D"]
 position = Vector2(576, 324)
 script = ExtResource("1_4flbx")
+speed = null
+metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_oul6g")

@@ -4,6 +4,7 @@ extends CharacterBody2D
 # Preload glitch system
 const Glitch = preload("res://glitches/glitch.gd")
 const GlitchController = preload("res://glitches/glitch_controller.gd")
+const GlitchTypes = preload("res://glitches/glitch_types.gd")
 
 signal hit
 @export var speed = 400
@@ -13,7 +14,12 @@ var glitch_controller: GlitchController
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	print("Player _ready() called")
 	screen_size = get_viewport_rect().size
+	print("Screen size: ", screen_size)
+
+	# Add to player group for UI and other systems to find
+	add_to_group("player")
 
 	# We let the 'start()' function handle this
 	if has_node("CollisionShape2D"):
@@ -33,12 +39,15 @@ func _ready() -> void:
 
 	# Add all available guns
 	gun_controller.available_guns = GunPresets.get_all_guns()
-	gun_controller.current_gun = gun_controller.available_guns[0]
-	
-	# Initialize ammo after guns are set (in case _ready() already ran)
-	gun_controller.initialize_ammo()
-	
-	print("Gun controller setup complete. Current gun: ", gun_controller.current_gun.gun_name)
+	if gun_controller.available_guns.size() > 0:
+		gun_controller.current_gun = gun_controller.available_guns[0]
+		
+		# Initialize ammo after guns are set (in case _ready() already ran)
+		gun_controller.initialize_ammo()
+		
+		print("Gun controller setup complete. Current gun: ", gun_controller.current_gun.gun_name)
+	else:
+		push_error("No guns available! GunPresets.get_all_guns() returned empty array.")
 
 	# Connect gun signals for UI updates (optional)
 	gun_controller.gun_switched.connect(_on_gun_switched)
@@ -62,35 +71,31 @@ func _physics_process(delta):
 	# Get input vector
 	var input_vector = Vector2.ZERO
 	if Input.is_action_pressed("move_right"):
-		input_vector.x += 1
+		velocity.x += 1
 	if Input.is_action_pressed("move_left"):
-		input_vector.x -= 1
+		velocity.x -= 1
 	if Input.is_action_pressed("move_down"):
-		input_vector.y += 1
+		velocity.y += 1
 	if Input.is_action_pressed("move_up"):
-		input_vector.y -= 1
+		velocity.y -= 1
 
-	# Set velocity
-	if input_vector.length() > 0:
-		velocity = input_vector.normalized() * speed
-		$AnimatedSprite2D.play()
+	if velocity.length() > 0:
+		velocity = velocity.normalized() * speed
+		if has_node("AnimatedSprite2D"):
+			$AnimatedSprite2D.play()
 	else:
-		velocity = Vector2.ZERO # Stop moving
-		$AnimatedSprite2D.stop()
-	
-	# This function moves the player and handles collisions automatically
-	move_and_slide()
-	
-	# We remove the position.clamp() line so you can move around the map
-	
-	# Animation logic
-	if velocity.x != 0:
-		$AnimatedSprite2D.animation = "walk"
-		$AnimatedSprite2D.flip_v = false
-		$AnimatedSprite2D.flip_h = velocity.x < 0
-	elif velocity.y != 0:
-		$AnimatedSprite2D.animation = "up"
-		$AnimatedSprite2D.flip_v = velocity.y > 0
+		if has_node("AnimatedSprite2D"):
+			$AnimatedSprite2D.stop()
+	position += velocity * delta
+	position = position.clamp(Vector2.ZERO, screen_size)
+	if has_node("AnimatedSprite2D"):
+		if velocity.x != 0:
+			$AnimatedSprite2D.animation = "walk"
+			$AnimatedSprite2D.flip_v = false
+			$AnimatedSprite2D.flip_h = velocity.x < 0
+		elif velocity.y != 0:
+			$AnimatedSprite2D.animation = "up"
+			$AnimatedSprite2D.flip_v = velocity.y > 0
 
 #
 # This function was the problem! It was part of Area2D and was

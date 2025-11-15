@@ -13,6 +13,7 @@ var facing: Vector2 = Vector2.RIGHT
 
 func _ready() -> void:
 	_health = max_health
+	add_to_group("enemies")  # Important for glitches and bullet detection
 	_on_spawned()
 
 func _physics_process(delta: float) -> void:
