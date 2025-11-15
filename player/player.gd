@@ -71,23 +71,29 @@ func _physics_process(delta):
 	# Get input vector
 	var input_vector = Vector2.ZERO
 	if Input.is_action_pressed("move_right"):
-		velocity.x += 1
+		input_vector.x += 1
 	if Input.is_action_pressed("move_left"):
-		velocity.x -= 1
+		input_vector.x -= 1
 	if Input.is_action_pressed("move_down"):
-		velocity.y += 1
+		input_vector.y += 1
 	if Input.is_action_pressed("move_up"):
-		velocity.y -= 1
+		input_vector.y -= 1
 
-	if velocity.length() > 0:
-		velocity = velocity.normalized() * speed
+	# Set the final velocity
+	if input_vector.length() > 0:
+		velocity = input_vector.normalized() * speed
 		if has_node("AnimatedSprite2D"):
 			$AnimatedSprite2D.play()
 	else:
+		velocity = Vector2.ZERO # Stop moving
 		if has_node("AnimatedSprite2D"):
 			$AnimatedSprite2D.stop()
-	position += velocity * delta
-	position = position.clamp(Vector2.ZERO, screen_size)
+
+	# THIS IS THE FIX:
+	# move_and_slide() handles all movement and collision.
+	move_and_slide()
+
+	# Handle animations AFTER moving
 	if has_node("AnimatedSprite2D"):
 		if velocity.x != 0:
 			$AnimatedSprite2D.animation = "walk"
