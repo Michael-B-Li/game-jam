@@ -4,6 +4,7 @@ extends CanvasLayer
 
 @onready var ammo_label: Label = $AmmoContainer/AmmoLabel
 @onready var bullet_icon: TextureRect = $AmmoContainer/BulletIcon
+@onready var ammo_container: HBoxContainer = $AmmoContainer
 
 # Preload the bullet texture
 const BULLET_TEXTURE = preload("res://bullet.png")
@@ -11,6 +12,15 @@ const BULLET_TEXTURE = preload("res://bullet.png")
 var player: Node2D = null
 
 func _ready() -> void:
+	# Apply HUD scale from settings
+	_apply_hud_scale()
+
+	# Connect to settings changes if SettingsManager exists
+	if Engine.has_singleton("SettingsManager"):
+		var settings = Engine.get_singleton("SettingsManager")
+		if settings.has_signal("hud_scale_changed"):
+			settings.hud_scale_changed.connect(_on_hud_scale_changed)
+
 	# Find player - wait a bit for player to initialize
 	await get_tree().process_frame
 	await get_tree().process_frame  # Wait extra frame for gun controller to be set up
@@ -32,6 +42,18 @@ func _ready() -> void:
 			_setup_gun_controller(gun_ctrl)
 		else:
 			push_warning("AmmoDisplay: gun_controller not found on player")
+
+func _apply_hud_scale() -> void:
+	# Get HUD scale from Engine metadata (set by settings)
+	var scale = 1.0
+	if Engine.has_meta("hud_scale"):
+		scale = Engine.get_meta("hud_scale")
+
+	# Apply scale to the ammo container
+	ammo_container.scale = Vector2(scale, scale)
+
+func _on_hud_scale_changed(new_scale: float) -> void:
+	ammo_container.scale = Vector2(new_scale, new_scale)
 
 func _setup_gun_controller(gun_ctrl) -> void:
 	# Connect to gun controller signals
