@@ -32,7 +32,7 @@ size = Vector2(40, 40)
 
 [node name="GunTest" type="Node2D"]
 
-[node name="Player" type="Area2D" parent="."]
+[node name="Player" type="CharacterBody2D" parent="."]
 position = Vector2(576, 324)
 script = ExtResource("1_player")
 
@@ -74,7 +74,6 @@ offset_right = 20.0
 offset_bottom = 20.0
 color = Color(1, 0.2, 0.2, 1)
 
-[connection signal="body_entered" from="Player" to="Player" method="_on_player_body_entered"]
 
 [node name="AmmoDisplay" parent="." instance=ExtResource("3_ammo")]
 
