@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3 uid="uid://by0y4tk3eu8ax"]
+
+[ext_resource type="Script" uid="uid://my0wow3x32jb" path="res://Dungeon/dungeon_room.gd" id="1_wux5i"]
+[ext_resource type="Texture2D" uid="uid://bk5acrkreywyk" path="res://Assets/Rudimentary_tileset.png" id="2_pw6kb"]
+[ext_resource type="PackedScene" uid="uid://brop5juemvf1j" path="res://player/player.tscn" id="3_pw6kb"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_t60vt"]
+texture = ExtResource("2_pw6kb")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -8, 8, 8, 8, 8, -8)
+1:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_jai0l"]
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_t60vt")
+
+[node name="Dungeon" type="Node2D"]
+script = ExtResource("1_wux5i")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_jai0l")
+format = 2
+
+[node name="Wall" type="TileMapLayer" parent="TileMap"]
+tile_set = SubResource("TileSet_jai0l")
+
+[node name="Ground" type="TileMapLayer" parent="TileMap"]
+tile_set = SubResource("TileSet_jai0l")
+
+[node name="Player" parent="." instance=ExtResource("3_pw6kb")]
