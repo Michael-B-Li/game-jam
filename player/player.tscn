@@ -20,6 +20,7 @@ position = Vector2(-1, 0)
 
 [node name="Player" type="Area2D" parent="."]
 script = ExtResource("1_4flbx")
+speed = null
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player"]

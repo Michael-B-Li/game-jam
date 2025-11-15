@@ -14,6 +14,9 @@ var glitch_controller: GlitchController
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
 
+	# Add to player group for UI and other systems to find
+	add_to_group("player")
+
 	# Show player for testing (comment out if using start() function)
 	show()
 	if has_node("CollisionShape2D"):
