@@ -146,18 +146,13 @@ func _physics_process(delta):
 				# Stopped from moving purely down/forward
 				$AnimatedSprite2D.animation = "i_f"
 
-	position += velocity * delta
-	position = position.clamp(Vector2.ZERO, screen_size)
-
+	# THIS IS THE FIX:
+	# Use move_and_slide() to handle movement and collisions.
+	move_and_slide()
 
 	# Test key for taking damage
 	if Input.is_action_just_pressed("ui_page_down"):
 		take_damage(10)
-
-func _on_player_body_entered(_body: Node2D):
-	hide()
-	hit.emit()
-	$CollisionShape2D.set_deferred("disabled", true)
 
 func start(pos):
 	position = pos
@@ -176,7 +171,7 @@ func _on_glitch_activated(glitch: Glitch) -> void:
 	print("GLITCH ACTIVATED: ", glitch.glitch_name)
 
 func _on_glitch_deactivated(glitch: Glitch) -> void:
-	print("GLITCH DEACTIVATED: ", glitch.glitch_name)
+	print("GLITCH DEACTIVATED: ", glitch.glitch_.glitch_name)
 
 func _on_energy_changed(current: int, max_energy: int) -> void:
 	print("Energy: ", current, "/", max_energy)
