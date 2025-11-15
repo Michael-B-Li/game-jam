@@ -10,10 +10,14 @@ config_version=5
 
 [application]
 
-config/name="accessible game"
+config/name="ERROR 67"
 run/main_scene="res://ui/main_menu.tscn"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+SettingsManager="*res://ui/settings_manager.gd"
 
 [input]
 

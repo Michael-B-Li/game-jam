@@ -16,16 +16,21 @@ This directory contains the main menu implementation for the game.
 ### Main Menu
 The main menu provides three options:
 - **PLAY** - Starts the game (loads `gun_test.tscn`)
-- **SETTINGS** - Opens the settings menu
+- **SETTINGS** - Opens the settings menu with options for:
+  - HUD Size (50%-200%)
+  - Sound Volume (0%-100%)
+  - Difficulty (Easy/Normal/Hard)
 - **QUIT** - Exits the game
 
 The menu features animated pixelated red exclamation marks on both sides that fade in and out at different intervals, creating a dynamic warning aesthetic that fits the "ERROR 67" theme.
 
 ### Settings Menu
-A placeholder settings menu with:
-- Title display
-- Placeholder content area for future settings
+A fully functional settings menu with:
+- **HUD Size** slider - Adjust UI scale from 50% to 200%
+- **Sound Volume** slider - Control master audio from 0% to 100%
+- **Difficulty** dropdown - Choose Easy, Normal, or Hard
 - **BACK** button to return to main menu
+- Settings are automatically saved to `user://settings.cfg`
 
 ## Setup
 
@@ -81,14 +86,20 @@ The main menu supports keyboard navigation:
 - **Enter/Space** - Activate selected button
 - **ESC** - Can be used to quit (if you add the functionality)
 
+## Settings System
+
+For detailed information about the settings system, see `SETTINGS.md`.
+
+The settings are stored in `user://settings.cfg` and persist between game sessions. The `SettingsManager` autoload singleton makes settings accessible from anywhere in the game.
+
 ## Future Enhancements
 
-The settings menu is currently a placeholder. You can add:
-- Volume controls (master, music, SFX)
-- Graphics settings
+Potential additions to the settings menu:
+- Separate volume controls (music, SFX, voice)
+- Graphics settings (fullscreen, VSync, resolution)
 - Keybinding configuration
-- Display mode (fullscreen/windowed)
-- Accessibility options
+- Display mode options
+- Additional accessibility options
 
 ## Integration Notes
 

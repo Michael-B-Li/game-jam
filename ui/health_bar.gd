@@ -5,11 +5,20 @@ extends CanvasLayer
 @onready var health_label: Label = $HealthContainer/HealthLabel
 @onready var progress_bar: ProgressBar = $HealthContainer/ProgressBar
 @onready var fill: ColorRect = $HealthContainer/ProgressBar/Fill
+@onready var health_container: VBoxContainer = $HealthContainer
 
 var player: Node2D = null
 var max_health: float = 100.0
 
 func _ready() -> void:
+	# Apply HUD scale from settings
+	_apply_hud_scale()
+
+	# Connect to settings changes if SettingsManager exists
+	if Engine.has_singleton("SettingsManager"):
+		var settings = Engine.get_singleton("SettingsManager")
+		if settings.has_signal("hud_scale_changed"):
+			settings.hud_scale_changed.connect(_on_hud_scale_changed)
 	# Find player
 	await get_tree().process_frame
 	player = get_tree().get_first_node_in_group("player")
@@ -32,6 +41,18 @@ func _ready() -> void:
 
 	# Set initial health
 	_update_health_display()
+
+func _apply_hud_scale() -> void:
+	# Get HUD scale from Engine metadata (set by settings)
+	var scale = 1.0
+	if Engine.has_meta("hud_scale"):
+		scale = Engine.get_meta("hud_scale")
+
+	# Apply scale to the health container
+	health_container.scale = Vector2(scale, scale)
+
+func _on_hud_scale_changed(new_scale: float) -> void:
+	health_container.scale = Vector2(new_scale, new_scale)
 
 func _process(_delta: float) -> void:
 	# Update health display each frame (fallback if no signal)
