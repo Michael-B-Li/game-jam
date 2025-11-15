@@ -6,6 +6,9 @@ var damage: int = 1
 var lifetime: float = 5.0  ## Bullet despawns after this many seconds
 
 func _ready() -> void:
+	# Add to bullets group for glitch interactions
+	add_to_group("bullets")
+
 	# Set up collision detection
 	body_entered.connect(_on_body_entered)
 

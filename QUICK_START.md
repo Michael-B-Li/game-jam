@@ -1,27 +1,69 @@
-# Quick Start Guide - Gun System Setup
+# Quick Start Guide - Gun & Glitch System Setup
+
+## 📁 Folder Structure
+
+All gun-related files are now organized in the `guns/` folder:
+
+```
+game-jam/
+├── guns/                   # Gun system
+│   ├── gun.gd              # Base Gun resource class
+│   ├── gun_controller.gd   # Main shooting controller
+│   ├── gun_presets.gd      # Pre-configured guns
+│   ├── bullet.gd           # Bullet script
+│   ├── bullet.tscn         # Bullet scene
+│   ├── example_custom_gun.gd  # Example code
+│   └── README.md           # Complete documentation
+├── glitches/               # Glitch system ✨
+│   ├── glitch.gd           # Base Glitch resource class
+│   ├── glitch_types.gd     # All glitch implementations
+│   ├── glitch_controller.gd # Glitch controller
+│   └── README.md           # Complete documentation
+├── player.gd               # Player script (includes both systems)
+├── QUICK_START.md          # This file
+└── TESTING.md              # Testing guide
+```
 
 ## ✅ What's Already Done
 
-The gun system is now integrated into your player! Here's what's been added:
+Both the gun system AND glitch system are integrated into your player!
 
 ### New Files Created:
-- `gun.gd` - Base gun resource class
-- `bullet.gd` - Bullet script with collision detection
-- `bullet.tscn` - Bullet scene file
-- `gun_controller.gd` - Main shooting controller
-- `gun_presets.gd` - Pre-made gun configurations
-- `GUN_SYSTEM_README.md` - Complete documentation
+
+**Guns System:**
+- `guns/` folder containing all gun system files:
+  - `gun.gd` - Base gun resource class
+  - `bullet.gd` - Bullet script with collision detection
+  - `bullet.tscn` - Bullet scene file
+  - `gun_controller.gd` - Main shooting controller
+  - `gun_presets.gd` - 4 pre-made guns (Pistol, Rifle, Shotgun, Revolver)
+  - `README.md` - Complete documentation
+
+**Glitch System:**
+- `glitches/` folder containing glitch system:
+  - `glitch.gd` - Base glitch resource class
+  - `glitch_types.gd` - 7 glitch implementations
+  - `glitch_controller.gd` - Glitch controller with energy system
+  - `README.md` - Complete documentation
 
 ### Updated Files:
-- `player.gd` - Now includes gun controller
-- `project.godot` - Added shooting/reload/weapon switching controls
+- `player.gd` - Now includes gun controller AND glitch controller
+- `project.godot` - Added shooting/reload/weapon switching + glitch controls
 
 ## 🎮 Controls
 
+### Guns
 - **Shoot**: Left Mouse Click or Spacebar
 - **Reload**: R key
-- **Switch Weapons**: 1-3 number keys
-- **Movement**: WASD (already set up)
+- **Switch Weapons**: 1-4 number keys
+
+### Glitches ✨
+- **Q** - Blink (teleport towards mouse)
+- **E** - Noclip (phase through walls)
+- **F** - Duplication (duplicate bullets)
+
+### Movement
+- **WASD** - Move around
 
 ## 🔫 Available Guns
 
@@ -35,8 +77,8 @@ The gun system is now integrated into your player! Here's what's been added:
 Open the project in Godot 4.x
 
 ### 2. Verify Bullet Scene
-The `bullet.tscn` file has been created. If you get warnings about it:
-- Open it in the editor
+The `guns/bullet.tscn` file has been created. If you get warnings about it:
+- Open it in the editor (located in the `guns/` folder)
 - It should have: Area2D → CollisionShape2D + ColorRect
 - The ColorRect provides the visual (small white square)
 
@@ -48,13 +90,19 @@ Run the game and:
 - Press 1-3 to switch weapons
 - Press 3 for revolver (high damage, only 6 shots)
 
-### 4. Set Up Enemy Collision (Important!)
+### 5. Set Up Enemy Collision (Important!)
 
-For bullets to hit enemies, add this to your enemy script:
+For bullets to hit enemies AND glitches to work properly, add this to your enemy script:
 
 ```gdscript
 # In enemy.gd
+extends CharacterBody2D  # or RigidBody2D, etc.
+
 var health: int = 100
+var speed: float = 100.0  # Important for Time Desync glitch!
+
+func _ready() -> void:
+    add_to_group("enemies")  # Important for glitches!
 
 func take_damage(amount: int) -> void:
     health -= amount
@@ -72,7 +120,7 @@ Also ensure your enemy's collision layer is set to **layer 4** in the editor.
 ## 🎨 Customization
 
 ### Change Bullet Visuals
-Edit `bullet.tscn` in Godot:
+Edit `guns/bullet.tscn` in Godot:
 - Select the ColorRect node
 - Change size, color, or replace with a Sprite2D
 
@@ -109,7 +157,7 @@ func _on_player_entered(player):
 ## 🐛 Troubleshooting
 
 **"Bullets don't spawn"**
-- Check console for warnings about bullet.tscn
+- Check console for warnings about guns/bullet.tscn
 - Make sure `gun_controller.bullet_scene` is assigned
 
 **"Bullets pass through enemies"**
@@ -126,21 +174,41 @@ func _on_player_entered(player):
 
 ## 📚 More Info
 
-See `GUN_SYSTEM_README.md` for:
-- Complete API documentation
+**Guns System**: See `guns/README.md` for:
+- Complete gun API documentation
 - Signal usage examples
 - Advanced customization
 - Creating special weapon types
 
+**Glitch System**: See `glitches/README.md` for:
+- All 7 available glitches (4 more to unlock!)
+- Energy and cooldown systems
+- Creating custom glitches
+- Roguelike integration ideas
+- Balance suggestions
+
 ## 🎯 Quick Test Checklist
 
+### Guns ✅
 - [ ] Game runs without errors
+- [ ] Player appears on screen
 - [ ] Player moves with WASD
 - [ ] Clicking spawns bullets toward mouse
 - [ ] Bullets appear on screen
-- [ ] Pressing 1-3 switches weapons
+- [ ] Pressing 1-4 switches weapons
 - [ ] Console shows "Switched to: [Gun Name]"
 - [ ] Pressing R reloads (console shows "Ammo: X/Y")
-- [ ] Revolver (key 3) has only 6 shots and high damage
+- [ ] Rifle (key 2) shoots automatically when held
+- [ ] Shotgun (key 3) fires 8 pellets in a spread
+- [ ] Revolver (key 4) has only 6 shots and high damage
 
-You're all set! The gun system is ready to use. 🎉
+### Glitches ✨
+- [ ] Pressing Q teleports player towards mouse (Blink)
+- [ ] Pressing E makes player translucent and walk through walls (Noclip)
+- [ ] Pressing F duplicates nearby bullets (Duplication)
+- [ ] Console shows "GLITCH ACTIVATED: [Glitch Name]"
+- [ ] Console shows "Energy: X/100"
+- [ ] Energy regenerates over time
+- [ ] Can't use glitch when energy is too low
+
+You're all set! Both gun and glitch systems are ready to use. 🎉🎮✨

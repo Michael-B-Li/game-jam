@@ -56,7 +56,7 @@ Ammo: 12/12  (after reload)
 
 ### Bullets don't appear
 - Check Output tab in Godot for errors
-- Make sure `bullet.tscn` exists in project root
+- Make sure `guns/bullet.tscn` exists in the guns folder
 - Verify Console shows "Switched to: [gun name]"
 
 ### Player doesn't move

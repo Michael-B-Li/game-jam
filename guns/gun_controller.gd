@@ -11,14 +11,25 @@ signal reloading(time: float)
 @export var current_gun: Gun
 @export var available_guns: Array[Gun] = []
 
-var current_ammo: int = -1
+var gun_ammo: Dictionary = {}  ## Tracks ammo per gun
 var can_shoot: bool = true
 var is_reloading: bool = false
 var shoot_timer: float = 0.0
 
 func _ready() -> void:
-	if current_gun and current_gun.ammo_capacity > 0:
-		current_ammo = current_gun.ammo_capacity
+	# Initialize ammo for all guns
+	for gun in available_guns:
+		if gun.ammo_capacity > 0:
+			gun_ammo[gun] = gun.ammo_capacity
+		else:
+			gun_ammo[gun] = -1
+
+	# Set current gun ammo
+	if current_gun:
+		if current_gun.ammo_capacity > 0:
+			gun_ammo[current_gun] = current_gun.ammo_capacity
+		else:
+			gun_ammo[current_gun] = -1
 
 func _process(delta: float) -> void:
 	if not current_gun:
@@ -42,6 +53,7 @@ func _process(delta: float) -> void:
 
 	# Handle reload input
 	if Input.is_action_just_pressed("reload") and not is_reloading:
+		var current_ammo = gun_ammo.get(current_gun, -1)
 		if current_gun.ammo_capacity > 0 and current_ammo < current_gun.ammo_capacity:
 			reload()
 
@@ -57,12 +69,17 @@ func shoot() -> void:
 
 	# Check ammo
 	if current_gun.ammo_capacity > 0:
+		var current_ammo = gun_ammo.get(current_gun, 0)
 		if current_ammo <= 0:
-			# Auto-reload or just click sound
-			reload()
+			# Out of ammo - can't shoot
 			return
-		current_ammo -= 1
-		ammo_changed.emit(current_ammo, current_gun.ammo_capacity)
+		gun_ammo[current_gun] = current_ammo - 1
+		ammo_changed.emit(gun_ammo[current_gun], current_gun.ammo_capacity)
+
+		# Auto-reload when ammo reaches 0
+		if gun_ammo[current_gun] == 0:
+			print("Magazine empty - auto-reloading!")
+			reload()
 
 	# Get shooting direction (towards mouse)
 	var mouse_pos: Vector2 = get_global_mouse_position()
@@ -105,10 +122,10 @@ func reload() -> void:
 
 	await get_tree().create_timer(current_gun.reload_time).timeout
 
-	current_ammo = current_gun.ammo_capacity
+	gun_ammo[current_gun] = current_gun.ammo_capacity
 	is_reloading = false
 	can_shoot = true
-	ammo_changed.emit(current_ammo, current_gun.ammo_capacity)
+	ammo_changed.emit(gun_ammo[current_gun], current_gun.ammo_capacity)
 
 func switch_gun(index: int) -> void:
 	if index < 0 or index >= available_guns.size():
@@ -116,12 +133,17 @@ func switch_gun(index: int) -> void:
 
 	current_gun = available_guns[index]
 
-	# Reset ammo for new gun
-	if current_gun.ammo_capacity > 0:
-		current_ammo = current_gun.ammo_capacity
+	# Initialize ammo for new gun if not tracked yet
+	if not gun_ammo.has(current_gun):
+		if current_gun.ammo_capacity > 0:
+			gun_ammo[current_gun] = current_gun.ammo_capacity
+		else:
+			gun_ammo[current_gun] = -1
+
+	# Emit current ammo for this gun
+	var current_ammo = gun_ammo.get(current_gun, -1)
+	if current_ammo >= 0:
 		ammo_changed.emit(current_ammo, current_gun.ammo_capacity)
-	else:
-		current_ammo = -1
 
 	# Reset state
 	is_reloading = false

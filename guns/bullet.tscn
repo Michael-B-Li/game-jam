@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://vwdjjyxqr3ip"]
+[gd_scene load_steps=3 format=3 uid="uid://c8ymh3qx5vn7w"]
 
-[ext_resource type="Script" path="res://bullet.gd" id="1_bullet"]
+[ext_resource type="Script" path="res://guns/bullet.gd" id="1_bullet"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bullet"]
 radius = 3.0
@@ -18,3 +18,4 @@ offset_left = -3.0
 offset_top = -3.0
 offset_right = 3.0
 offset_bottom = 3.0
+color = Color(1, 1, 1, 1)
