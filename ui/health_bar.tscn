@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8vx3j5k9m2n1"]
+[gd_scene load_steps=3 format=3 uid="uid://c8vx3j5lam2n1"]
 
 [ext_resource type="Script" uid="uid://d4k2m5n6o7p8q" path="res://ui/health_bar.gd" id="1_health"]
 [ext_resource type="FontFile" uid="uid://c3w61p24ge26h" path="res://snowbell-font/Snowbell-Wp4g9.ttf" id="2_font"]

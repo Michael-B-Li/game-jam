@@ -7,10 +7,12 @@ const GlitchController = preload("res://glitches/glitch_controller.gd")
 const GlitchTypes = preload("res://glitches/glitch_types.gd")
 
 signal hit
+
 signal health_changed(new_health: float)
 @export var speed = 400
 @export var max_health: float = 100.0
 var health: float = 100.0
+
 var screen_size
 var last_dir = Vector2.DOWN
 var gun_controller: GunController

@@ -1,87 +1,135 @@
 extends Node2D
 
 ## Dungeon Generator for Godot 4
-## This script creates a single room in the middle of a map.
-## It expects a "TileMap" child with "Ground" and "Walls" layers.
-## It also expects a "Player" scene as a child.
+## Generates a sequence of rooms, one at a time.
+## Fades to black when transitioning between rooms.
 
 # --- Node References ---
 @onready var ground_layer: TileMapLayer = $TileMap/Ground
 @onready var walls_layer: TileMapLayer = $TileMap/Wall
-@onready var player: CharacterBody2D = $Player # Make sure this matches your player type
+@onready var door_layer: TileMapLayer = $TileMap/Door
+@onready var player: CharacterBody2D = $Player
+@onready var fade_screen: ColorRect = $FadeScreen # <-- NEW
 
 # --- Tile Atlas Coordinates ---
-const FLOOR_COORDS = Vector2i(1, 0) # Your ground/floor tile
-const WALL_COORDS = Vector2i(0, 0)  # Your wall tile
-const SOURCE_ID = 0                 # This is 0 if you only have one tilesheet
+const FLOOR_COORDS = Vector2i(1, 0)
+const WALL_COORDS = Vector2i(0, 0)
+const SOURCE_ID = 0
+
+const DOOR_COORDS = Vector2i(0, 0)
+const DOOR_SOURCE_ID = 0
 
 # --- Dungeon Parameters ---
-@export var map_width := 30
-@export var map_height := 20
-
 @export var room_width := 20
 @export var room_height := 15
+@export var boss_room_width := 30
+@export var boss_room_height := 20
+@export var map_size := Vector2i(40, 30)
 
-# This will hold our one room
-var room: Rect2i
+# --- State Tracking ---
+@export var rooms_until_boss := 3
+var current_room_level := 0
+var player_on_door := false
+var is_transitioning := false # <-- NEW: Prevents multiple fades
 
 
 func _ready() -> void:
-	generate_single_room()
+	generate_room()
 
 
-func generate_single_room() -> void:
-	# Clear any old data
+func _physics_process(delta):
+	# Do nothing if we're already fading
+	if is_transitioning:
+		return
+
+	var player_tile_pos = door_layer.local_to_map(player.global_position)
+	var source_id = door_layer.get_cell_source_id(player_tile_pos)
+	
+	if source_id == DOOR_SOURCE_ID:
+		if not player_on_door:
+			player_on_door = true
+			# Call the new transition function INSTEAD of generate_room()
+			transition_to_next_room()
+	else:
+		player_on_door = false
+
+
+# --- NEW: This function handles the fade effect ---
+func transition_to_next_room() -> void:
+	is_transitioning = true
+	
+	# 1. Fade to black
+	var tween = create_tween()
+	print("generating new room")
+	## Animate the 'modulate' property, specifically its 'alpha' (a) channel
+	tween.tween_property(fade_screen, "modulate:a", 1, 1)
+	await tween.finished # Wait for the fade-in to complete
+	print("faded in")
+	## 2. Generate the new room (while the screen is black)
+	generate_room()
+	
+	# 3. Fade back to transparent
+	tween = create_tween()
+	tween.tween_property(fade_screen, "modulate:a", 0.0, 0.5)
+	await tween.finished # Wait for the fade-out to complete
+	print("faded out")
+	# 4. We are done
+	is_transitioning = false
+
+
+# This is the main function that builds a new room
+func generate_room() -> void:
+	# 1. Clear the old room
 	ground_layer.clear()
 	walls_layer.clear()
+	door_layer.clear()
 	
-	# 1. Fill the entire map with walls
+	# 2. Decide which room to build
+	var is_boss_room = (current_room_level == rooms_until_boss)
+	var room_rect: Rect2i
+	
+	if is_boss_room:
+		var x = (map_size.x - boss_room_width) / 2
+		var y = (map_size.y - boss_room_height) / 2
+		room_rect = Rect2i(x, y, boss_room_width, boss_room_height)
+	else:
+		var x = (map_size.x - room_width) / 2
+		var y = (map_size.y - room_height) / 2
+		room_rect = Rect2i(x, y, room_width, room_height)
+
+	# 3. Fill map with walls and carve the room
 	_fill_map_with_walls()
+	_carve_room(room_rect)
 	
-	# 2. Define our single room
-	# Calculate top-left corner to centre the room
-	var room_x = (map_width - room_width) / 2
-	var room_y = (map_height - room_height) / 2
-	room = Rect2i(room_x, room_y, room_width, room_height)
-	
-	# 3. Carve out the room
-	_carve_room(room)
-	
-	# 4. Spawn the player
-	_spawn_player()
+	# 4. Place door (if not boss room)
+	if not is_boss_room:
+		var door_pos_grid = Vector2i(room_rect.end.x - 1, room_rect.get_center().y)
+		door_layer.set_cell(door_pos_grid, DOOR_SOURCE_ID, DOOR_COORDS)
 
-
-# --- Step 1: Fill the Map ---
-func _fill_map_with_walls() -> void:
-	for x in range(map_width):
-		for y in range(map_height):
-			walls_layer.set_cell(Vector2i(x, y), SOURCE_ID, WALL_COORDS)
-
-
-# --- Step 3: Carve a Room ---
-func _carve_room(room_rect: Rect2i) -> void:
-	# room_rect.position is the top-left corner
-	# room_rect.end is the bottom-right corner
-	for x in range(room_rect.position.x, room_rect.end.x):
-		for y in range(room_rect.position.y, room_rect.end.y):
-			# Set a floor tile on the Ground layer
-			ground_layer.set_cell(Vector2i(x, y), SOURCE_ID, FLOOR_COORDS)
-			# Remove the wall tile from the Walls layer
-			walls_layer.set_cell(Vector2i(x, y), -1) # -1 clears a tile
-
-
-# --- Step 4: Spawn the Player ---
-func _spawn_player() -> void:
-	# Get the centre in *tile coordinates*
-	var spawn_pos_grid = room.get_center()
-	
-	# Convert tile coordinates to *pixel coordinates*
+	# 5. Spawn the player
+	var spawn_pos_grid = Vector2i(room_rect.position.x + 2, room_rect.get_center().y)
 	var spawn_pos_pixels = ground_layer.map_to_local(spawn_pos_grid)
 	
-	# Call the player's start function with the pixel position
 	if player.has_method("start"):
 		player.start(spawn_pos_pixels)
 	else:
-		# Failsafe if the 'start' function isn't found
 		player.position = spawn_pos_pixels
 		player.show()
+
+	# 6. Increment room counter
+	current_room_level += 1
+
+
+# --- Helper: Fill the Map ---
+func _fill_map_with_walls() -> void:
+	for x in range(map_size.x):
+		for y in range(map_size.y):
+			walls_layer.set_cell(Vector2i(x, y), SOURCE_ID, WALL_COORDS)
+
+
+# --- Helper: Carve a Room ---
+func _carve_room(room_rect: Rect2i) -> void:
+	for x in range(room_rect.position.x, room_rect.end.x):
+		for y in range(room_rect.position.y, room_rect.end.y):
+			ground_layer.set_cell(Vector2i(x, y), SOURCE_ID, FLOOR_COORDS)
+			walls_layer.set_cell(Vector2i(x, y), -1)
